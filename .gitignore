@@ -1,4 +1,21 @@
-translator
-translator.library*
-narrator
-narrator.device*
+# runtime requirements
+/Accents/
+/Devs/
+/Libs/
+/Sys/
+
+# build/test artifacts
+/build/
+/download/
+/hello_world.s8
+/hello_world.txt
+/narrator
+/narrator.exe
+/translateas
+/translateas.exe
+/translator
+/translator.exe
+
+# ignore project files
+/.idea/
+
