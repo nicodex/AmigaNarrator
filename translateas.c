@@ -67,26 +67,6 @@ static void print_help(void);
 static void print_version(void);
 static int translate(char const *, char const *, char const *);
 
-/*****************************************************************************
- * Linux shell example
-
-$ (\
-  TEXT="$(\
-    echo 'Können wir das schaffen? \american{Yes, we can!}' \
-    | iconv -t ISO-8859-1//IGNORE -)" \
-  && (echo "${TEXT}" | iconv -f ISO-8859-1 -) \
-  && TRANS="$(./translateas 'deutsch' "${TEXT}" 2>/dev/null)" \
-  && echo "${TRANS}" \
-  && (\
-    ./narrator "$TRANS" 2>/dev/null \
-    | ffplay -f s8 -ar 22200 -ac 1 -autoexit -nodisp -hide_banner - 2>/dev/null \
-  )\
-)
-\deutsch{ Können wir das? } \american{ Yes, we can! }
-KAO2NNEHN WHIHIXRX DAAS?   YEH2S, WIY KAEN.
-
-*****************************************************************************/
-
 /****************************************************************************
  * base types
  */
