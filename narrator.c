@@ -44,7 +44,7 @@ static int _mode_parameter = 0; //mode 0=naturalf0 1=roboticf0 2=manualf0
 static char *_inputptr = 0;
 static char _inputbuf[INPUT_BUFSIZE];
 
-static unsigned char *_library_path = "narrator.device";
+static char const *_library_path = "Devs/narrator.device";
 
 #define LIBRARY_BUFSIZE 100000
 #define LIBRARY_MAX_HUNKS 8
@@ -133,7 +133,7 @@ void process_hunks()
             fprintf(stderr, "first_hunk %d\n", first_hunk);
             unsigned int last_hunk = library_read_32();
             fprintf(stderr, "last_hunk %d\n", last_hunk);
-            for (int i=first_hunk; i<=last_hunk; i++) {
+            for (unsigned int i=first_hunk; i<=last_hunk; i++) {
                 unsigned int hunk_size = library_read_32();
                 fprintf(stderr, "hunk %d size 0x%x\n", i, hunk_size);
             }
@@ -147,7 +147,7 @@ void process_hunks()
             }
             _library_hunk_base[hunk_index] = memory_pos;
             hunk_index++;
-            for (int i=0; i<number_of_longwords; i++) {
+            for (unsigned int i=0; i<number_of_longwords; i++) {
                 unsigned int val = library_read_32();
                 m68k_write_memory_32_no_log(memory_pos, val);
                 memory_pos += 4;
@@ -163,7 +163,7 @@ void process_hunks()
                 }
                 unsigned int hunk_number = library_read_32();
                 fprintf(stderr, "hunk_number %d\n", hunk_number);
-                for (int i=0; i<number_of_offsets; i++) {
+                for (unsigned int i=0; i<number_of_offsets; i++) {
                     unsigned int offset = library_read_32();
 //                    fprintf(stderr, "offset %d 0x%x\n", i, offset);
                 }
@@ -185,7 +185,7 @@ void process_hunks()
             }
             _library_hunk_base[hunk_index] = memory_pos;
             hunk_index++;
-            for (int i=0; i<number_of_longwords; i++) {
+            for (unsigned int i=0; i<number_of_longwords; i++) {
                 unsigned int val = library_read_32();
                 m68k_write_memory_32_no_log(memory_pos, val);
                 memory_pos += 4;
@@ -343,7 +343,7 @@ void process_library()
 
     m68k_set_reg(M68K_REG_SP, _stackpointer);
 
-    strcpy(_ram+_libraryname, "narrator.device");
+    strcpy((char *)_ram+_libraryname, "narrator.device");
     m68k_set_reg(M68K_REG_A1, _libraryname);
 
     m68k_set_reg(M68K_REG_A2, _librarybase);
@@ -395,6 +395,31 @@ unsigned int m68k_read_memory_32(unsigned int addr)
     val |= *p;
 //  fprintf(stderr, "m68k_read_memory_32 %x %x\n", addr, val);
     return val;
+}
+
+unsigned int m68k_read_immediate_16(unsigned int address)
+{
+    return m68k_read_memory_16(address);
+}
+
+unsigned int m68k_read_immediate_32(unsigned int address)
+{
+    return m68k_read_memory_32(address);
+}
+
+unsigned int m68k_read_pcrelative_8(unsigned int address)
+{
+    return m68k_read_memory_8(address);
+}
+
+unsigned int m68k_read_pcrelative_16(unsigned int address)
+{
+    return m68k_read_memory_16(address);
+}
+
+unsigned int m68k_read_pcrelative_32(unsigned int address)
+{
+    return m68k_read_memory_32(address);
 }
 
 void m68k_write_memory_8(unsigned int addr, unsigned int val)
@@ -501,7 +526,7 @@ unsigned int m68k_read_disassembler_32(unsigned int addr)
 void make_hex(char *buf, unsigned int pc, unsigned int len)
 {
 	char *p = buf;
-    for (int i=0; i<len; i+=2) {
+    for (unsigned int i=0; i<len; i+=2) {
         if (i > 0) {
 			*p++ = ' ';
         }
@@ -650,7 +675,7 @@ void instr_hook_callback(unsigned int pc)
                 if (len >= INPUT_BUFSIZE) {
                     len = INPUT_BUFSIZE;
                 }
-                strncpy(_ram+_inputbase, _inputptr, INPUT_BUFSIZE);
+                strncpy((char *)_ram+_inputbase, _inputptr, INPUT_BUFSIZE);
                 m68k_write_memory_16(_narrator_rb+28, 3); // CMD_WRITE 3 //io_Command
                 m68k_write_memory_32(_narrator_rb+44, 0); //io_Offset
                 m68k_write_memory_32(_narrator_rb+40, _inputbase); //io_Data
@@ -698,7 +723,7 @@ void instr_hook_callback(unsigned int pc)
                 fprintf(stderr, "***** BeginIO ioa_Volume %x\n", ioa_Volume);
                 unsigned int ioa_Cycles = m68k_read_memory_16(a1+46);
                 fprintf(stderr, "***** BeginIO ioa_Cycles %x\n", ioa_Cycles);
-                for (int i=0; i<ioa_Length; i++) {
+                for (unsigned int i=0; i<ioa_Length; i++) {
                     fprintf(stderr, "***** BeginIO ioa_Data %d %x\n", i, m68k_read_memory_8(ioa_Data+i));
                 }
                 if (io_Command == 32) {//ADCMD_ALLOCATE
@@ -736,7 +761,7 @@ void instr_hook_callback(unsigned int pc)
     }
 }
 
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     for (int i=1; i<argc; i++) {
         if (!strcmp(argv[i], "-")) {
@@ -845,19 +870,19 @@ void main(int argc, char **argv)
         fprintf(stderr, "\n");
         fprintf(stderr, "%s \"/HEH4LOW WER4LD.\"\n", argv[0]);
         fprintf(stderr, "%s -p 110 -r 150 -f 22200 -s 1 -m 1 \"/HEH4LOW WER4LD.\"\n", argv[0]);
-        fprintf(stderr, "%s -d narrator.device~1.0 \"/HEH4LOW WER4LD.\"\n", argv[0]);
-        fprintf(stderr, "%s -d narrator.device~1.1 \"/HEH4LOW WER4LD.\"\n", argv[0]);
-        fprintf(stderr, "%s -d narrator.device~1.2 \"/HEH4LOW WER4LD.\"\n", argv[0]);
-        fprintf(stderr, "%s -d narrator.device~2.04 \"/HEH4LOW WER4LD.\"\n", argv[0]);
+        fprintf(stderr, "%s -d Devs/narrator.device~1.0 \"/HEH4LOW WER4LD.\"\n", argv[0]);
+        fprintf(stderr, "%s -d Devs/narrator.device~1.1 \"/HEH4LOW WER4LD.\"\n", argv[0]);
+        fprintf(stderr, "%s -d Devs/narrator.device~1.2 \"/HEH4LOW WER4LD.\"\n", argv[0]);
+        fprintf(stderr, "%s -d Devs/narrator.device~2.04 \"/HEH4LOW WER4LD.\"\n", argv[0]);
         
         fprintf(stderr, "\n");
         fprintf(stderr, "# read from stdin\n");
         fprintf(stderr, "%s -\n", argv[0]);
         fprintf(stderr, "%s -p 110 -r 150 -f 22200 -s 1 -m 1 -\n", argv[0]);
-        fprintf(stderr, "%s -d narrator.device~1.0 -\n", argv[0]);
-        fprintf(stderr, "%s -d narrator.device~1.1 -\n", argv[0]);
-        fprintf(stderr, "%s -d narrator.device~1.2 -\n", argv[0]);
-        fprintf(stderr, "%s -d narrator.device~2.04 -\n", argv[0]);
+        fprintf(stderr, "%s -d Devs/narrator.device~1.0 -\n", argv[0]);
+        fprintf(stderr, "%s -d Devs/narrator.device~1.1 -\n", argv[0]);
+        fprintf(stderr, "%s -d Devs/narrator.device~1.2 -\n", argv[0]);
+        fprintf(stderr, "%s -d Devs/narrator.device~2.04 -\n", argv[0]);
         fprintf(stderr, "\n");
         fprintf(stderr, "PCM samples will be written to stdout.\n");
         fprintf(stderr, "The format is S8 (signed 8-bit) at 22200 Hz\n");

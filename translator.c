@@ -30,7 +30,7 @@
 
 #include "m68k.h"
 
-static unsigned char *_library_path = "translator.library";
+static char const *_library_path = "Libs/translator.library";
 
 #define LIBRARY_BUFSIZE 100000
 static unsigned char _library_buf[LIBRARY_BUFSIZE];
@@ -70,7 +70,7 @@ void copy_library_to_ram()
     }
 }
 
-void process_library_with_romtag(char *str)
+void process_library_with_romtag(char const *str)
 {
     fprintf(stderr, "rt_MatchWord 0x4afc\n");
     fprintf(stderr, "rt_MatchTag 0x%x\n", m68k_read_memory_32(2));
@@ -137,7 +137,7 @@ void process_library_with_romtag(char *str)
     if (len >= INPUT_BUFSIZE) {
         len = INPUT_BUFSIZE;
     }
-    strncpy(_ram + _inputbase, str, len);
+    strncpy((char *)_ram+_inputbase, str, INPUT_BUFSIZE);
     m68k_set_reg(M68K_REG_A0, _inputbase);
     m68k_set_reg(M68K_REG_D0, len);
     m68k_set_reg(M68K_REG_A1, _outputbase);
@@ -153,7 +153,7 @@ void process_library_with_romtag(char *str)
     m68k_set_reg(M68K_REG_PC, _mainbase);
 }
 
-void process_library(char *str)
+void process_library(char const *str)
 {
     if ((_ram[0] == 0x4a) && (_ram[1] == 0xfc)) {
         fprintf(stderr, "ROMTag found\n");
@@ -167,7 +167,7 @@ void process_library(char *str)
     if (len >= INPUT_BUFSIZE) {
         len = INPUT_BUFSIZE;
     }
-    strncpy(_ram + _inputbase, str, len);
+    strncpy((char *)_ram+_inputbase, str, INPUT_BUFSIZE);
     m68k_set_reg(M68K_REG_A0, _inputbase);
     m68k_set_reg(M68K_REG_D0, len);
     m68k_set_reg(M68K_REG_A1, _outputbase);
@@ -214,6 +214,31 @@ unsigned int m68k_read_memory_32(unsigned int addr)
     val |= *p;
 //fprintf(stderr, "m68k_read_memory_32 %x %x\n", addr, val);
     return val;
+}
+
+unsigned int m68k_read_immediate_16(unsigned int address)
+{
+    return m68k_read_memory_16(address);
+}
+
+unsigned int m68k_read_immediate_32(unsigned int address)
+{
+    return m68k_read_memory_32(address);
+}
+
+unsigned int m68k_read_pcrelative_8(unsigned int address)
+{
+    return m68k_read_memory_8(address);
+}
+
+unsigned int m68k_read_pcrelative_16(unsigned int address)
+{
+    return m68k_read_memory_16(address);
+}
+
+unsigned int m68k_read_pcrelative_32(unsigned int address)
+{
+    return m68k_read_memory_32(address);
 }
 
 void m68k_write_memory_8(unsigned int addr, unsigned int val)
@@ -280,7 +305,7 @@ unsigned int m68k_read_disassembler_32(unsigned int addr)
 void make_hex(char *buf, unsigned int pc, unsigned int len)
 {
 	char *p = buf;
-    for (int i=0; i<len; i+=2) {
+    for (unsigned int i=0; i<len; i+=2) {
         if (i > 0) {
 			*p++ = ' ';
         }
@@ -308,9 +333,9 @@ void instr_hook_callback(unsigned int pc)
     }
 }
 
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-    unsigned char *text = 0;
+    char *text = 0;
     for (int i=1; i<argc; i++) {
         if (!strcmp(argv[i], "-l")) {
             if (i+1 < argc) {
@@ -330,11 +355,11 @@ void main(int argc, char **argv)
         fprintf(stderr, "\n");
         fprintf(stderr, "Examples:\n");
         fprintf(stderr, "%s \"Hello world.\"\n", argv[0]);
-        fprintf(stderr, "%s -l translator.library~1.0 \"Hello world.\"\n", argv[0]);
-        fprintf(stderr, "%s -l translator.library~1.1 \"Hello world.\"\n", argv[0]);
-        fprintf(stderr, "%s -l translator.library~1.2 \"Hello world.\"\n", argv[0]);
-        fprintf(stderr, "%s -l translator.library~1.3.3 \"Hello world.\"\n", argv[0]);
-        fprintf(stderr, "%s -l translator.library~2.04 \"Hello world.\"\n", argv[0]);
+        fprintf(stderr, "%s -l Libs/translator.library~1.0 \"Hello world.\"\n", argv[0]);
+        fprintf(stderr, "%s -l Libs/translator.library~1.1 \"Hello world.\"\n", argv[0]);
+        fprintf(stderr, "%s -l Libs/translator.library~1.2 \"Hello world.\"\n", argv[0]);
+        fprintf(stderr, "%s -l Libs/translator.library~1.3.3 \"Hello world.\"\n", argv[0]);
+        fprintf(stderr, "%s -l Libs/translator.library~2.04 \"Hello world.\"\n", argv[0]);
         exit(1);
     }
 
