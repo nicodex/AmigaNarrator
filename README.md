@@ -25,7 +25,18 @@ is simulated by trapping the exec.library calls.
 
 ## Example
 
-http://hotdoglinux.com/AmigaNarrator/it_is_the_distant_future.wav
+Cover of Robots (The Humans Are Dead) - Flight of the Conchords
+
+Performed by Amiga narrator.device (and YM2413)
+
+Listen on YouTube:
+
+https://www.youtube.com/watch?v=kT68O6jtOVY
+
+Or audio only:
+
+https://fmamp.com/AmigaNarrator/robots.m4a
+
 
 ## How to compile and run
 
@@ -141,7 +152,7 @@ https://github.com/kstenerud/Musashi
 
 Copyright (c) 2023 Arthur Choung. All rights reserved.
 
-Email: arthur -at- hotdoglinux.com
+Email: arthur -at- fmamp.com
 
 Released under the GNU General Public License, version 3.
 
