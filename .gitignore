@@ -1,4 +1,29 @@
-translator
-translator.library*
-narrator
-narrator.device*
+# runtime requirements
+/Accents/
+/Devs/
+/Libs/
+/Sys/
+
+# build/test artifacts
+/bin/
+/build/
+/build-mxe/
+/build-mxe-i686/
+/build-mxe-x86_64/
+/download/
+/hello_world.s8
+/hello_world.txt
+/L/
+/Makefile.mxe_cross
+/mxe-plugins/
+/mxe-test/
+/narrator
+/narrator.exe
+/translateas
+/translateas.exe
+/translator
+/translator.exe
+
+# ignore project files
+/.idea/
+

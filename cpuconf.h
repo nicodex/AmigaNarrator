@@ -64,17 +64,18 @@
 /* ======================================================================== */
 
 /* Turn ON if you want to use the following M68K variants */
-#define M68K_EMULATE_010            OPT_ON
-#define M68K_EMULATE_EC020          OPT_ON
+#define M68K_EMULATE_010            OPT_OFF
+#define M68K_EMULATE_EC020          OPT_OFF
 #define M68K_EMULATE_020            OPT_ON
-#define M68K_EMULATE_040            OPT_ON
+#define M68K_EMULATE_030            OPT_OFF
+#define M68K_EMULATE_040            OPT_OFF
 
 
 /* If ON, the CPU will call m68k_read_immediate_xx() for immediate addressing
  * and m68k_read_pcrelative_xx() for PC-relative addressing.
  * If off, all read requests from the CPU will be redirected to m68k_read_xx()
  */
-#define M68K_SEPARATE_READS         OPT_OFF
+#define M68K_SEPARATE_READS         OPT_ON
 
 /* If ON, the CPU will call m68k_write_32_pd() when it executes move.l with a
  * predecrement destination EA mode instead of m68k_write_32().
@@ -88,8 +89,8 @@
  * If off, all interrupts will be autovectored and all interrupt requests will
  * auto-clear when the interrupt is serviced.
  */
-#define M68K_EMULATE_INT_ACK        OPT_SPECIFY_HANDLER
-#define M68K_INT_ACK_CALLBACK(A)    cpu_irq_ack(A)
+#define M68K_EMULATE_INT_ACK        OPT_OFF
+#define M68K_INT_ACK_CALLBACK(A)    your_int_ack_handler_function(A)
 
 
 /* If ON, CPU will call the breakpoint acknowledge callback when it encounters
@@ -107,8 +108,8 @@
 /* If ON, CPU will call the output reset callback when it encounters a reset
  * instruction.
  */
-#define M68K_EMULATE_RESET          OPT_SPECIFY_HANDLER
-#define M68K_RESET_CALLBACK()       cpu_pulse_reset()
+#define M68K_EMULATE_RESET          OPT_OFF
+#define M68K_RESET_CALLBACK()       op_reset_callback()
 
 /* If ON, CPU will call the callback when it encounters a cmpi.l #v, dn
  * instruction.
@@ -138,7 +139,7 @@
  * use a dummy default handler and you'll have to call m68k_set_illg_instr_callback explicitely
  */
 #define M68K_ILLG_HAS_CALLBACK	    OPT_OFF
-#define M68K_ILLG_CALLBACK(opcode)  op_illg(opcode)
+#define M68K_ILLG_CALLBACK(opcode)  op_illegal_callback(opcode)
 
 /* If ON, CPU will call the set fc callback on every memory access to
  * differentiate between user/supervisor, program/data access like a real
@@ -146,33 +147,33 @@
  * want to properly emulate the m68010 or higher. (moves uses function codes
  * to read/write data from different address spaces)
  */
-#define M68K_EMULATE_FC             OPT_SPECIFY_HANDLER
-#define M68K_SET_FC_CALLBACK(A)     cpu_set_fc(A)
+#define M68K_EMULATE_FC             OPT_OFF
+#define M68K_SET_FC_CALLBACK(A)     your_set_fc_handler_function(A)
 
 /* If ON, CPU will call the pc changed callback when it changes the PC by a
  * large value.  This allows host programs to be nicer when it comes to
  * fetching immediate data and instructions on a banked memory system.
  */
-#define M68K_MONITOR_PC             OPT_OFF
+#define M68K_MONITOR_PC             OPT_ON
 #define M68K_SET_PC_CALLBACK(A)     your_pc_changed_handler_function(A)
 
 
 /* If ON, CPU will call the instruction hook callback before every
  * instruction.
  */
-#define M68K_INSTRUCTION_HOOK       OPT_SPECIFY_HANDLER
-#define M68K_INSTRUCTION_CALLBACK(pc) cpu_instr_callback(pc)
+#define M68K_INSTRUCTION_HOOK       OPT_ON
+#define M68K_INSTRUCTION_CALLBACK(pc) your_instruction_hook_function(pc)
 
 
 /* If ON, the CPU will emulate the 4-byte prefetch queue of a real 68000 */
-#define M68K_EMULATE_PREFETCH       OPT_ON
+#define M68K_EMULATE_PREFETCH       OPT_OFF
 
 
 /* If ON, the CPU will generate address error exceptions if it tries to
  * access a word or longword at an odd address.
  * NOTE: This is only emulated properly for 68000 mode.
  */
-#define M68K_EMULATE_ADDRESS_ERROR  OPT_ON
+#define M68K_EMULATE_ADDRESS_ERROR  OPT_OFF
 
 
 /* Turn ON to enable logging of illegal instruction calls.
@@ -183,6 +184,9 @@
 #define M68K_LOG_1010_1111          OPT_OFF
 #define M68K_LOG_FILEHANDLE         some_file_handle
 
+/* Emulate PMMU : if you enable this, there will be a test to see if the current chip has some enabled pmmu added to every memory access,
+ * so enable this only if it's useful */
+#define M68K_EMULATE_PMMU   OPT_OFF
 
 /* ----------------------------- COMPATIBILITY ---------------------------- */
 
@@ -195,20 +199,6 @@
  * operations.
 */
 #define M68K_USE_64_BIT  OPT_ON
-
-
-#include "sim.h"
-
-#define m68k_read_memory_8(A) cpu_read_byte(A)
-#define m68k_read_memory_16(A) cpu_read_word(A)
-#define m68k_read_memory_32(A) cpu_read_long(A)
-
-#define m68k_read_disassembler_16(A) cpu_read_word_dasm(A)
-#define m68k_read_disassembler_32(A) cpu_read_long_dasm(A)
-
-#define m68k_write_memory_8(A, V) cpu_write_byte(A, V)
-#define m68k_write_memory_16(A, V) cpu_write_word(A, V)
-#define m68k_write_memory_32(A, V) cpu_write_long(A, V)
 
 
 #endif /* M68K_COMPILE_FOR_MAME */

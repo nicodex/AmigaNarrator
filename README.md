@@ -2,6 +2,13 @@
 
 Commodore Amiga narrator.device emulator
 
+Note: This is __detached fork__, as the upstream repository has been deleted.
+      The code is almost entirely by [Arthur Choung];
+      the changes made since the upstream version are:
+ - add support for the [translator42] library (TranslateAs)
+ - remove local Musashi copy (added as git submodule)
+ - some minor project/build cleanup
+
 ## Background
 
 The narrator.device is a speech synthesizer for the Commodore Amiga written by
@@ -41,24 +48,28 @@ https://fmamp.com/AmigaNarrator/robots.m4a
 ## How to compile and run
 
 ```
-$ sh build.sh
+$ make
 ```
 
-This results in two binaries, 'narrator' and 'translator'.
+This results in three binaries, `narrator`, `translator`, and `translateas`.
 
-First, use 'translator' to convert English text to phonetic text.
+First, use `translator` to convert English text to phonetic text.
 
-Then, use 'narrator' to convert phonetic text to PCM samples.
+Then, use `narrator` to convert phonetic text to PCM samples.
 
 The PCM samples are S8 (mono signed 8-bit) at 22200 Hz.
 
 Don't forget to end your sentences with a period.
 
-Run 'translator' and 'narrator' with no arguments for a list of options, such
-as pitch, rate, and so forth.
+Run commands with no arguments for a list of options,
+such as pitch, rate, and so forth.
 
-The 'say.sh' script is an example for Linux, and will run 'translator',
-'narrator', and then play the PCM samples with ALSA using 'aplay'.
+The `translateas` command is an alternate to the `translator` binary
+that uses the [translator42] library.
+
+The `./say.sh` script is an example for Linux, and will run `translator`
+or `translateas`, passes the phenetic string to `narrator`,
+and then plays the PCM samples with [SoX_ng]'s `play_ng`.
 
 ```
 $ sh say.sh "Hello world."
@@ -67,7 +78,7 @@ $ sh say.sh "Hello world."
 To run separately:
 
 ```
-$ ./translator "Hello world." >hello_world.txt
+$ ./bin/translator "Hello world." > hello_world.txt
 ```
 
 The file 'hello_world.txt' should contain:
@@ -77,30 +88,26 @@ The file 'hello_world.txt' should contain:
 ```
 
 ```
-$ cat hello_world.txt | ./narrator - >hello_world.s8
+$ cat hello_world.txt | ./bin/narrator - > hello_world.s8
 ```
 
 It will run faster if stderr is redirected to /dev/null:
 
 ```
-$ cat hello_world.txt | ./narrator - 2>/dev/null >hello_world.s8
+$ cat hello_world.txt | ./bin/narrator - 2>/dev/null > hello_world.s8
 ```
 
-On Linux, 'aplay' can be used to play the file:
+On Linux, [SoX_ng] can be used to play the file:
 
 ```
-$ aplay -f S8 -r 22200 hello_world.s8
+$ play_ng -r 22200 -e signed -b 8 -t raw hello_world.s8
 ```
-
-For OS X, a program such as Audacity or SoX will need to be used to convert
-the raw samples to a playable format like WAV. This has been tested on OS X
-10.12 Sierra and seems to work fine.
 
 ## narrator.device
 
-This file will be loaded from the current directory when 'narrator' is run. An
-alternative file can be specified using the '-d' flag on 'narrator', but the
-flag does not work on 'say.sh'.
+This file will be loaded from `./Devs/` when `narrator` is run.
+An alternative file can be specified using the `-d` flag on `narrator`
+(for `./say.sh` you have to set/export `DEV_PATH`).
 
 It has been tested with the narrator.device from:
 
@@ -115,9 +122,9 @@ This file is not supplied.
 
 ## translator.library
 
-This file will be loaded from the current directory when 'translator' is run. An
-alternative file can be specified using the '-l' flag on 'translator', but the
-flag does not work on 'say.sh'.
+This file will be loaded from `./Libs/` when `translator` is run.
+An alternative file can be specified using the `-l` flag on `translator`
+(for `./say.sh` you have to set/export `LIB_PATH`).
 
 It has been tested with the translator.library from:
 
@@ -157,4 +164,8 @@ Email: arthur -at- fmamp.com
 Released under the GNU General Public License, version 3.
 
 For details on the license, refer to the LICENSE file.
+
+[Arthur Choung]: https://github.com/arthurchoung
+[translator42]: https://aminet.net/package/util/libs/translator42
+[SoX_ng]: https://codeberg.org/sox_ng/sox_ng
 
