@@ -35,13 +35,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
  * only the AmigaOS 1.3 variant of the Translator V42 library is supported
  * (v33_translator.library does not use the locale.library for error strings).
  */
-#if (M68K_SEPARATE_READS != OPT_ON)
+#if (M68K_SEPARATE_READS != M68K_OPT_ON)
 #error "TranslateAs requires separate reads for emulation."
 #endif
-#if (M68K_MONITOR_PC != OPT_ON)
+#if (M68K_MONITOR_PC != M68K_OPT_ON)
 #error "TranslateAs requires PC changed callbacks for emulation."
 #endif
-#if (M68K_EMULATE_PREFETCH != OPT_OFF)
+#if (M68K_EMULATE_PREFETCH != M68K_OPT_OFF)
 #error "TranslateAs emulation does not support enabled prefetch."
 #endif
 
@@ -1351,7 +1351,7 @@ static void load_error(FILE **stream, char const *format, ...) {
 
 static m68k_long_t load_long(FILE **stream, char const *name) {
   m68k_byte_t buffer[4];
-  if (fread(buffer, sizeof(*buffer), ARRAY_LENGTH(buffer), *stream) == ARRAY_LENGTH(buffer)) {
+  if (fread(buffer, sizeof(*buffer), M68K_ARRAY_LENGTH(buffer), *stream) == M68K_ARRAY_LENGTH(buffer)) {
     m68k_long_t const value = m68k_get_long(buffer);
     log_printf(LOG_TRACE, "load_long: " PRIM68KxLONG " %s\n", value, name);
     return value;
