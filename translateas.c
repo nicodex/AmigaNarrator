@@ -647,7 +647,7 @@ static void exec_CloseLibrary(m68k_addr_t library) {
   }
 }
 
-static void call_put_ch_proc(char ch) {
+static void call_put_ch_proc(m68k_byte_t ch) {
   m68k_set_reg(M68K_REG_D0, ch);
   call_function(m68k_get_reg(NULL, M68K_REG_A2));
 }
