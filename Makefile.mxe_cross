@@ -1,0 +1,76 @@
+#
+# Cross compile AmigaNarrator for Windows
+# on Linux with MXE (M cross environment).
+#
+#   make -f Makefile.mxe_cross
+#
+# 'mostlyclean' target does not remove the
+# cross build environment (faster rebuild).
+#
+
+MXE_GIT_OPTS ?= --branch=master --depth=1
+MXE_GIT_REPO ?= https://github.com/mxe/mxe.git
+MXE_LIB_TYPE ?= static
+MXE_PACKAGES ?= mxe-conf cc
+MXE_ROOT_DIR ?= build-mxe
+MXE_PLUG_DIR ?= $(abspath mxe-plugins)
+BUILD_PREFIX ?= $(MXE_ROOT_DIR)-
+BUILD_TARGET ?= i686 x86_64
+
+export PATH := $(abspath $(MXE_ROOT_DIR)/usr/bin):$(PATH)
+PYTHON_PATH := $(or $(shell PATH="$(PATH)" which python),$(shell which python2),$(shell which python3))
+
+.PHONY: all
+all: $(foreach exe,narrator translator translateas,$(addsuffix /$(exe).exe,$(addprefix $(BUILD_PREFIX),$(BUILD_TARGET))))
+
+.PHONY: check
+check: | $(MXE_ROOT_DIR)/Makefile
+	cd $(MXE_ROOT_DIR) && $(MAKE) MXE_TARGETS="$(addsuffix -w64-mingw32.static,$(BUILD_TARGET))" check-requirements
+ifeq (,$(PYTHON_PATH))
+	$(error no python command found)
+endif
+
+.PHONY: clean
+clean: mostlyclean
+	rm -rf $(MXE_ROOT_DIR)
+
+.PHONY: mostlyclean
+mostlyclean:
+	rm -rf $(addprefix $(BUILD_PREFIX),$(BUILD_TARGET))
+
+.PRECIOUS: $(MXE_ROOT_DIR)/Makefile
+$(MXE_ROOT_DIR)/Makefile:
+	git clone $(MXE_GIT_OPTS) $(MXE_GIT_REPO) $(MXE_ROOT_DIR)
+ifneq (,$(MXE_PLUG_DIR))
+	printf '\n# AmigaNarrator settings\n' > $(MXE_ROOT_DIR)/settings.mk
+	printf 'override MXE_PLUGIN_DIRS += %s\n' $(MXE_PLUG_DIR) >> $(MXE_ROOT_DIR)/settings.mk
+endif
+
+.PRECIOUS: $(MXE_ROOT_DIR)/usr/bin/python
+$(MXE_ROOT_DIR)/usr/bin/python:
+ifeq (,$(shell PATH="$(PATH)" which python))
+	@echo 'MXE Warning! unversioned python command added'
+	mkdir -p $(dir $@) && ln -s $(or $(PYTHON_PATH),/usr/bin/python) $@
+endif
+
+.PRECIOUS: $(MXE_ROOT_DIR)/usr/%-w64-mingw32.static/installed/mxe-conf
+$(MXE_ROOT_DIR)/usr/%-w64-mingw32.static/installed/mxe-conf: | $(MXE_ROOT_DIR)/Makefile $(MXE_ROOT_DIR)/usr/bin/python
+	cd $(MXE_ROOT_DIR) && $(MAKE) MXE_TARGETS=$*-w64-mingw32.static mxe-conf
+
+.PRECIOUS: $(MXE_ROOT_DIR)/usr/i686-w64-mingw32.static/installed/%
+$(MXE_ROOT_DIR)/usr/i686-w64-mingw32.static/installed/%: | $(MXE_ROOT_DIR)/Makefile
+	cd $(MXE_ROOT_DIR) && $(MAKE) MXE_TARGETS=i686-w64-mingw32.static $*
+
+.PRECIOUS: $(MXE_ROOT_DIR)/usr/x86_64-w64-mingw32.static/installed/%
+$(MXE_ROOT_DIR)/usr/x86_64-w64-mingw32.static/installed/%: | $(MXE_ROOT_DIR)/Makefile
+	cd $(MXE_ROOT_DIR) && $(MAKE) MXE_TARGETS=x86_64-w64-mingw32.static $*
+
+.PRECIOUS: $(BUILD_PREFIX)%/prepared
+$(BUILD_PREFIX)%/prepared: | $(addprefix $(MXE_ROOT_DIR)/usr/%-w64-mingw32.static/installed/, $(MXE_PACKAGES))
+	mkdir -p $(BUILD_PREFIX)$* && touch $(BUILD_PREFIX)$*/prepared
+
+$(BUILD_PREFIX)%/narrator.exe $(BUILD_PREFIX)%/translator.exe $(BUILD_PREFIX)%/translateas.exe &: | $(BUILD_PREFIX)%/prepared
+	$(MAKE) CROSS=$*-w64-mingw32.static- \
+	BUILDDIR=$(BUILD_PREFIX)$* OUTDIR=$(BUILD_PREFIX)$* \
+	EXE=.exe CROSS_EXEC=wine
+
