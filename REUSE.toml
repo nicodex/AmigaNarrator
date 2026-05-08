@@ -1,0 +1,32 @@
+version = 1
+
+[[annotations]]
+path = [
+ "Examples/it_is_the_distant_future.wav",
+ "narrator.c",
+ "translator.c"
+]
+SPDX-FileCopyrightText = "2023 Arthur Choung"
+SPDX-License-Identifier = "GPL-3.0-only"
+
+[[annotations]]
+path = [
+ "translateas.c"
+]
+SPDX-FileCopyrightText = "2024 Nico Bendlin <nico @nicode.net>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = [
+ ".clang-format",
+ ".gitignore",
+ ".gitmodules",
+ "Makefile",
+ "Makefile.mxe_cross",
+ "README.md",
+ "cpuconf.h",
+ "mxe-plugins/gcc-overlay.mk",
+ "say.sh"
+]
+SPDX-FileCopyrightText = "2026 Nico Bendlin <nico@nicode.net>"
+SPDX-License-Identifier = "0BSD"

@@ -1,12 +1,3 @@
-/* clang-format off */
-/*
-SPDX-FileCopyrightText: 2024 Nico Bendlin <nico @nicode.net>
-
-SPDX-License-Identifier: GPL-3.0-or-later
-
- */
-/* clang-format on */
-
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
