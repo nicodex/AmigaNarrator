@@ -2,6 +2,7 @@ ifneq (,$(CROSS))
 	CC = $(CROSS)gcc
 endif
 CROSS_EXEC ?=
+CROSS_LDFLAGS ?=
 EXE ?=
 BUILDDIR ?= build
 OUTDIR ?= ./bin
@@ -24,6 +25,7 @@ else
 endif
 CPPFLAGS += -DMUSASHI_CNF=\"$(abspath cpuconf.h)\"
 CFLAGS += -I$(MUSASHIDIR)
+LDFLAGS += $(CROSS_LDFLAGS)
 
 MUSASHIOBJ = $(addprefix $(BUILDDIR)/,\
 	m68kcpu.o \

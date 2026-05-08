@@ -70,7 +70,5 @@ $(BUILD_PREFIX)%/prepared: | $(addprefix $(MXE_ROOT_DIR)/usr/%-w64-mingw32.stati
 	mkdir -p $(BUILD_PREFIX)$* && touch $(BUILD_PREFIX)$*/prepared
 
 $(BUILD_PREFIX)%/narrator.exe $(BUILD_PREFIX)%/translator.exe $(BUILD_PREFIX)%/translateas.exe &: | $(BUILD_PREFIX)%/prepared
-	$(MAKE) CROSS=$*-w64-mingw32.static- \
-	BUILDDIR=$(BUILD_PREFIX)$* OUTDIR=$(BUILD_PREFIX)$* \
-	EXE=.exe CROSS_EXEC=wine
+	$(MAKE) EXE=.exe CROSS=$*-w64-mingw32.static- CROSS_EXEC=wine CROSS_LDFLAGS=-s BUILDDIR=$(BUILD_PREFIX)$* OUTDIR=$(BUILD_PREFIX)$*
 
