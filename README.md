@@ -9,6 +9,7 @@ Note: This is __detached fork__, as the upstream repository has been deleted.
  - remove local Musashi copy (added as git submodule)
  - some minor project/build cleanup
 
+
 ## Background
 
 The narrator.device is a speech synthesizer for the Commodore Amiga written by
@@ -23,12 +24,14 @@ Podcast.
 
 https://ataripodcast.libsyn.com/antic-interview-385-software-automatic-mouth-mark-barton
 
+
 ## Overview
 
 Similar to vamos (Virtual AmigaOS runtime), this is a tool that will run the
 code from the narrator.device and translator.library. The actual code is
 emulated using the Musashi 680x0 CPU emulator, while just enough of the OS
 is simulated by trapping the exec.library calls.
+
 
 ## Example
 
@@ -39,10 +42,6 @@ Performed by Amiga narrator.device (and YM2413)
 Listen on YouTube:
 
 https://www.youtube.com/watch?v=kT68O6jtOVY
-
-Or audio only:
-
-https://fmamp.com/AmigaNarrator/robots.m4a
 
 
 ## How to compile and run
@@ -120,6 +119,7 @@ It has been tested with the narrator.device from:
 
 This file is not supplied.
 
+
 ## translator.library
 
 This file will be loaded from `./Libs/` when `translator` is run.
@@ -138,10 +138,11 @@ It has been tested with the translator.library from:
 
 This file is not supplied.
 
+
 ## Resources
 
 #### Markus Wandel's Amiga Exec disassembly
-https://wandel.ca/homepage/execdis/index.html
+https://wandel.ca/homepage/execdis/
 
 #### Amiga Developer Docs
 http://amigadev.elowar.com/
@@ -155,15 +156,21 @@ https://github.com/cnvogelg/amitools
 #### Musashi 680x0 CPU emulator by Karl Stenerud
 https://github.com/kstenerud/Musashi
 
+
 ## Legal
 
-Copyright (c) 2023 Arthur Choung. All rights reserved.
+The original source is Copyright (C) 2023 Arthur Choung
+and released under the GNU General Public License v3.0.
 
-Email: arthur -at- fmamp.com
+The translateas.c is Copyright (C) 2024 Nico Bendlin
+and released under the GNU General Public License v3.0 or later.
 
-Released under the GNU General Public License, version 3.
+Additional files are Copyright (C) 2026 Nico Bendlin
+and released under the BSD Zero Clause License.
 
-For details on the license, refer to the LICENSE file.
+For details on the licenses, refer to the [REUSE](REUSE.toml) file.
+
+[![REUSE status](https://api.reuse.software/badge/github.com/nicodex/AmigaNarrator)](https://api.reuse.software/info/github.com/nicodex/AmigaNarrator)
 
 [Arthur Choung]: https://github.com/arthurchoung
 [translator42]: https://aminet.net/package/util/libs/translator42
